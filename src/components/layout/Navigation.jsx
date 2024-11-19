@@ -2,7 +2,6 @@ import { Link, useLocation } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import useOptimizedScroll from '../../hooks/useOptimizedScroll'
 
 const Nav = styled.nav`
   position: fixed;
@@ -14,9 +13,7 @@ const Nav = styled.nav`
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: ${props => props.theme.zIndex.high};
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(${props => props.$hidden ? '-100%' : '0'});
-  will-change: transform;
+  transition: background-color 0.3s ease;
 `
 
 const NavContainer = styled.div`
@@ -228,30 +225,9 @@ const MobileMenuLinks = styled(motion.div)`
 `
 
 const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const scrollDirection = useOptimizedScroll(50)
-  const [isNavHidden, setIsNavHidden] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 50
-      setScrolled(isScrolled)
-    }
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    if (scrollDirection === 'down' && window.scrollY > 150) {
-      setIsNavHidden(true)
-    } else {
-      setIsNavHidden(false)
-    }
-  }, [scrollDirection])
 
   const navItems = [
     { path: '/home', label: 'Home' },
@@ -259,6 +235,19 @@ const Navigation = () => {
     { path: '/cases', label: 'Cases' },
     { path: '/contact', label: 'Contact' }
   ]
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location])
 
   const menuVariants = {
     closed: {
@@ -280,7 +269,7 @@ const Navigation = () => {
   }
 
   return (
-    <Nav $scrolled={scrolled} $hidden={isNavHidden}>
+    <Nav $scrolled={scrolled}>
       <NavContainer>
         <LogoWrapper to="/">
           <LogoSVG viewBox="0 0 32 32">
@@ -297,8 +286,8 @@ const Navigation = () => {
           ))}
         </NavLinks>
         <MobileMenuButton 
-          onClick={() => setIsOpen(!isOpen)}
-          isOpen={isOpen}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          isOpen={isMobileMenuOpen}
         >
           <span></span>
           <span></span>
@@ -309,7 +298,7 @@ const Navigation = () => {
       {/* Mobile Menu */}
       <MobileMenuContainer
         initial="closed"
-        animate={isOpen ? "open" : "closed"}
+        animate={isMobileMenuOpen ? "open" : "closed"}
         variants={menuVariants}
       >
         <MobileMenuLinks

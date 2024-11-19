@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 // Base styled components
@@ -26,7 +26,7 @@ const Section = styled.section`
 `
 
 const SectionContent = styled.div`
-  max-width: ${props => props.theme.containers.content};
+  max-width: min(${props => props.theme.containers.content}, 95%);
   margin: 0 auto;
   padding: 0 ${props => props.theme.spacing.lg};
 
@@ -43,42 +43,54 @@ const HeroSection = styled(Section)`
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 85vh;
-  padding: ${props => props.theme.spacing['5xl']} 0;
+  min-height: 100vh;
+  padding: 0;
   background: #000000;
   overflow: hidden;
-`
 
-const HeroBackground = styled(motion.div)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('${import.meta.env.BASE_URL}images/hero/hero-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.4) contrast(1.2);
-  z-index: 0;
-  will-change: transform;
-`
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('${import.meta.env.BASE_URL}images/hero/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    transform: translateZ(0);
+    will-change: transform;
+    filter: brightness(0.4) contrast(1.2);
+    z-index: 1;
+    pointer-events: none;
+  }
 
-const HeroOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 1;
-  pointer-events: none;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 2;
+    pointer-events: none;
+  }
 `
 
 const HeroContent = styled(motion.div)`
   position: relative;
-  z-index: 2;
+  z-index: 10;
   max-width: ${props => props.theme.containers.text};
   margin: 0 auto;
+  padding: ${props => props.theme.spacing.xl};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: ${props => props.theme.spacing.md};
+  user-select: text;
+  pointer-events: auto;
 `
 
 const Title = styled(motion.h1)`
@@ -89,7 +101,17 @@ const Title = styled(motion.h1)`
   color: #FFFFFF;
   margin-bottom: ${props => props.theme.spacing.md};
   letter-spacing: -0.015em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  user-select: text;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+
+  span {
+    color: #FFFFFF;
+    display: inline-block;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: ${props => props.theme.typography.fontSizes['5xl']};
@@ -98,12 +120,16 @@ const Title = styled(motion.h1)`
 
 const Subtitle = styled(motion.p)`
   font-size: ${props => props.theme.typography.fontSizes.lg};
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: ${props => props.theme.spacing.xl};
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  user-select: text;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     font-size: ${props => props.theme.typography.fontSizes.xl};
@@ -125,30 +151,33 @@ const SectionTitle = styled.h2`
 // Process Components
 const ProcessGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: ${props => props.theme.spacing.xl};
-  margin: ${props => props.theme.spacing.xl} 0;
-  contain: content;
-  will-change: transform;
+  margin-bottom: ${props => props.theme.spacing['4xl']};
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.desktop}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `
 
 const ProcessCard = styled(motion.div)`
+  background: ${props => props.theme.colors.background};
+  padding: ${props => props.theme.spacing.xl};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  box-shadow: ${props => props.theme.shadows.md};
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: ${props => props.theme.spacing.xl};
-  background: ${props => props.theme.colors.backgroundAlt};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  box-shadow: ${props => props.theme.shadows.md};
-  transition: transform 0.3s ease;
-  contain: content;
-  will-change: transform, opacity;
 
-  @media (hover: hover) {
-    &:hover {
-      transform: translateY(-5px);
-    }
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: ${props => props.theme.shadows.lg};
   }
 `
 
@@ -188,51 +217,61 @@ const ProcessDescription = styled.p`
 // Project Components
 const ProjectsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 1fr;
   gap: ${props => props.theme.spacing.xl};
-  margin: ${props => props.theme.spacing.xl} 0;
+  margin-bottom: ${props => props.theme.spacing['4xl']};
+
+  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: ${props => props.theme.breakpoints.desktop}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 `
 
-const ProjectCard = styled(Link)`
+const ProjectCard = styled(motion(Link))`
   position: relative;
+  display: block;
+  width: 100%;
+  height: 300px;
   border-radius: ${props => props.theme.borderRadius.lg};
   overflow: hidden;
-  aspect-ratio: 16/9;
-  display: block;
-  
-  &:hover {
-    ${ProjectOverlay} {
-      opacity: 1;
-    }
-  }
-`
-
-const ProjectImage = styled.div`
-  width: 100%;
-  height: 100%;
-  background-image: url(${props => props.image});
+  text-decoration: none;
+  background-image: ${props => `url('${import.meta.env.BASE_URL}${props.$image}')`};
   background-size: cover;
   background-position: center;
-  transition: transform 0.3s ease;
+  transform: translateZ(0);
+  will-change: transform;
 
-  ${ProjectCard}:hover & {
-    transform: scale(1.05);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    z-index: 1;
+  }
+
+  &:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
   }
 `
 
-const ProjectOverlay = styled.div`
+const ProjectContent = styled.div`
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   padding: ${props => props.theme.spacing.xl};
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  z-index: 2;
 `
 
 const ProjectTitle = styled.h3`
@@ -240,60 +279,83 @@ const ProjectTitle = styled.h3`
   font-size: ${props => props.theme.typography.fontSizes.xl};
   font-weight: ${props => props.theme.typography.fontWeights.semibold};
   color: white;
-  margin-bottom: ${props => props.theme.spacing.sm};
+  margin-bottom: ${props => props.theme.spacing.xs};
 `
 
 const ProjectType = styled.p`
-  color: rgba(255, 255, 255, 0.8);
   font-size: ${props => props.theme.typography.fontSizes.md};
+  color: rgba(255, 255, 255, 0.9);
 `
 
 // CTA Components
 const CTASection = styled.div`
   text-align: center;
-  margin-top: ${props => props.theme.spacing['2xl']};
+  margin-top: ${props => props.theme.spacing['3xl']};
 `
 
 const CTAButton = styled(Link)`
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
-  background: ${props => props.theme.colors.primary};
-  color: white;
-  border-radius: ${props => props.theme.borderRadius.md};
-  font-weight: ${props => props.theme.typography.fontWeights.medium};
+  background-color: ${props => props.theme.colors.accent};
+  color: #FFFFFF;
+  font-size: ${props => props.theme.typography.fontSizes.base};
+  font-weight: ${props => props.theme.typography.fontWeights.semibold};
+  border-radius: ${props => props.theme.borderRadius.full};
+  text-decoration: none;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
 
   &:hover {
+    background-color: ${props => props.theme.colors.linkHover};
     transform: translateY(-2px);
-    background: ${props => props.theme.colors.primaryDark};
+    color: #FFFFFF;
   }
 `
 
 // Component Implementation
 const Home = () => {
   const { scrollY } = useScroll();
-  const heroRef = useRef(null);
-  
   const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0.5]);
   
-  const springY = useSpring(y, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
+  const [isMobile, setIsMobile] = useState(false);
+  
   useEffect(() => {
-    if (!heroRef.current) return;
-    
-    const loadImage = new Image();
-    loadImage.src = '${import.meta.env.BASE_URL}images/hero/hero-bg.jpg';
-    loadImage.onload = () => {
-      if (heroRef.current) {
-        heroRef.current.style.opacity = 1;
-      }
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
     };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const heroVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const processCardVariants = {
+    offscreen: { opacity: 0, y: 20 },
+    onscreen: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        delay: i * 0.1,
+        ease: "easeOut"
+      }
+    })
+  };
 
   const processSteps = [
     {
@@ -368,44 +430,75 @@ const Home = () => {
     {
       title: "Codeium AI - Developer Tool",
       type: "Product Design",
-      image: `${import.meta.env.BASE_URL}images/projects/codeium.jpg`,
+      image: "images/projects/codeium.jpg",
       link: "/cases"
     },
     {
       title: "Windsurf IDE - Code Editor",
       type: "UI/UX Design",
-      image: `${import.meta.env.BASE_URL}images/projects/windsurf.jpg`,
+      image: "images/projects/windsurf.jpg",
       link: "/cases"
     },
     {
       title: "Tesla Mobile App Concept",
       type: "Mobile Design",
-      image: `${import.meta.env.BASE_URL}images/projects/tesla.jpg`,
+      image: "images/projects/tesla.jpg",
       link: "/cases"
     }
   ]
 
   return (
     <HomeContainer>
-      <HeroSection ref={heroRef}>
-        <HeroBackground
-          style={{
-            y: springY,
-            opacity
+      <HeroSection>
+        <motion.div
+          style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+            y: isMobile ? 0 : y,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none'
           }}
-        />
-        <HeroOverlay />
-        <SectionContent>
-          <HeroContent
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+        >
+          <SectionContent
+            style={{
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 10,
+              pointerEvents: 'auto'
+            }}
           >
-            <Title>Artem Svitelskyi</Title>
-            <Subtitle>UI/UX Designer & Creative Developer</Subtitle>
-            <Subtitle>Transforming Ideas into Seamless Digital Experiences</Subtitle>
-          </HeroContent>
-        </SectionContent>
+            <HeroContent
+              variants={heroVariants}
+              initial="initial"
+              animate="animate"
+            >
+              <Title>
+                <span>Artem Svitelskyi</span>
+              </Title>
+              <Subtitle
+                style={{ opacity: 0.85 }}
+              >
+                UI/UX Designer & Creative Developer
+              </Subtitle>
+              <Subtitle
+                style={{ opacity: 0.75 }}
+              >
+                Crafting intuitive interfaces and meaningful experiences through minimalist design, user-centered thinking, and clean code
+              </Subtitle>
+            </HeroContent>
+          </SectionContent>
+        </motion.div>
       </HeroSection>
 
       <Section>
@@ -415,10 +508,11 @@ const Home = () => {
             {processSteps.map((step, index) => (
               <ProcessCard
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true, margin: "-10%" }}
+                custom={index}
+                variants={processCardVariants}
+                initial="offscreen"
+                whileInView="onscreen"
+                viewport={{ once: true, amount: 0.3 }}
               >
                 <ProcessIcon 
                   $gradientStart={step.gradientStart} 
@@ -438,28 +532,29 @@ const Home = () => {
               <ProjectCard
                 key={index}
                 to={project.link}
-                as={motion.div}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                $image={project.image}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true, margin: "-10%" }}
+                viewport={{ once: true, amount: 0.3 }}
               >
-                <ProjectImage image={project.image} />
-                <ProjectOverlay>
+                <ProjectContent>
                   <ProjectTitle>{project.title}</ProjectTitle>
                   <ProjectType>{project.type}</ProjectType>
-                </ProjectOverlay>
+                </ProjectContent>
               </ProjectCard>
             ))}
           </ProjectsGrid>
 
           <CTASection>
-            <CTAButton to="/cases">View All Cases</CTAButton>
+            <CTAButton to="/cases">
+              View All Cases
+            </CTAButton>
           </CTASection>
         </SectionContent>
       </Section>
     </HomeContainer>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home

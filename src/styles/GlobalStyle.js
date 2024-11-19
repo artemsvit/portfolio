@@ -11,12 +11,6 @@ const GlobalStyle = createGlobalStyle`
     font-size: 16px;
     scroll-behavior: smooth;
     background-color: ${props => props.theme.colors.background};
-    /* Add scroll optimization */
-    -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
-    @media (prefers-reduced-motion: reduce) {
-      scroll-behavior: auto;
-    }
   }
 
   body {
@@ -26,12 +20,6 @@ const GlobalStyle = createGlobalStyle`
     line-height: ${props => props.theme.typography.lineHeights.base};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Add scroll optimization */
-    overflow-x: hidden;
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    perspective: 1000;
   }
 
   h1, h2, h3, h4, h5, h6 {
