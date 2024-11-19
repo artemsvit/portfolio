@@ -5,9 +5,13 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (document.documentElement.scrollTop === 0) return;
+
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: prefersReducedMotion ? 'auto' : 'smooth'
     });
   }, [pathname]);
 
