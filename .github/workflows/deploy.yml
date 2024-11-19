@@ -10,6 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,21 +28,31 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-        
-      - name: List files before build
-        run: ls -la
+        run: |
+          npm ci
+          npm list vite || true
+          npm list @vitejs/plugin-react || true
+
+      - name: Debug environment
+        run: |
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          echo "Directory contents:"
+          ls -la
+          echo "Package.json contents:"
+          cat package.json
         
       - name: Build
-        run: npm run build
+        run: |
+          echo "Starting build process..."
+          npm run build
+          echo "Build completed. Dist directory contents:"
+          ls -la dist/
         env:
           REACT_APP_EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
           REACT_APP_EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
           REACT_APP_EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
           
-      - name: List dist directory
-        run: ls -la dist
-        
       - name: Setup Pages
         uses: actions/configure-pages@v3
         
