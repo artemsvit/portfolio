@@ -26,7 +26,7 @@ const Section = styled.section`
 `
 
 const SectionContent = styled.div`
-  max-width: min(${props => props.theme.containers.content}, 95%);
+  max-width: ${props => props.theme.containers.content};
   margin: 0 auto;
   padding: 0 ${props => props.theme.spacing.lg};
 
@@ -191,25 +191,18 @@ const ProjectsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: ${props => props.theme.spacing.xl};
   margin: ${props => props.theme.spacing.xl} 0;
-  contain: content;
-  will-change: transform;
 `
 
-const ProjectCard = styled(motion(Link))`
+const ProjectCard = styled(Link)`
   position: relative;
   border-radius: ${props => props.theme.borderRadius.lg};
   overflow: hidden;
   aspect-ratio: 16/9;
-  contain: content;
-  will-change: transform, opacity;
-
-  @media (hover: hover) {
-    &:hover {
-      transform: scale(1.02);
-      
-      ${ProjectOverlay} {
-        opacity: 1;
-      }
+  display: block;
+  
+  &:hover {
+    ${ProjectOverlay} {
+      opacity: 1;
     }
   }
 `
@@ -217,15 +210,10 @@ const ProjectCard = styled(motion(Link))`
 const ProjectImage = styled.div`
   width: 100%;
   height: 100%;
-  background-image: url(${props => `${import.meta.env.BASE_URL}${props.image}`});
+  background-image: url(${props => props.image});
   background-size: cover;
   background-position: center;
   transition: transform 0.3s ease;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 
   ${ProjectCard}:hover & {
     transform: scale(1.05);
@@ -238,16 +226,11 @@ const ProjectOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.85) 100%
-  );
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: ${props => props.theme.spacing.xl};
-  z-index: 1;
   opacity: 0;
   transition: opacity 0.3s ease;
 `
@@ -257,39 +240,32 @@ const ProjectTitle = styled.h3`
   font-size: ${props => props.theme.typography.fontSizes.xl};
   font-weight: ${props => props.theme.typography.fontWeights.semibold};
   color: white;
-  margin-bottom: ${props => props.theme.spacing.xs};
+  margin-bottom: ${props => props.theme.spacing.sm};
 `
 
 const ProjectType = styled.p`
+  color: rgba(255, 255, 255, 0.8);
   font-size: ${props => props.theme.typography.fontSizes.md};
-  color: rgba(255, 255, 255, 0.9);
 `
 
 // CTA Components
 const CTASection = styled.div`
   text-align: center;
-  margin-top: ${props => props.theme.spacing['3xl']};
+  margin-top: ${props => props.theme.spacing['2xl']};
 `
 
 const CTAButton = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   padding: ${props => props.theme.spacing.md} ${props => props.theme.spacing.xl};
-  background-color: ${props => props.theme.colors.accent};
-  color: #FFFFFF;
-  font-size: ${props => props.theme.typography.fontSizes.base};
-  font-weight: ${props => props.theme.typography.fontWeights.semibold};
-  border-radius: ${props => props.theme.borderRadius.full};
-  text-decoration: none;
+  background: ${props => props.theme.colors.primary};
+  color: white;
+  border-radius: ${props => props.theme.borderRadius.md};
+  font-weight: ${props => props.theme.typography.fontWeights.medium};
   transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
 
   &:hover {
-    background-color: ${props => props.theme.colors.linkHover};
     transform: translateY(-2px);
-    color: #FFFFFF;
+    background: ${props => props.theme.colors.primaryDark};
   }
 `
 
@@ -367,7 +343,7 @@ const Home = () => {
     {
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0112 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
         </svg>
       ),
       gradientStart: '#FF3CAC',
@@ -392,19 +368,19 @@ const Home = () => {
     {
       title: "Codeium AI - Developer Tool",
       type: "Product Design",
-      image: "/images/projects/codeium.jpg",
+      image: `${import.meta.env.BASE_URL}images/projects/codeium.jpg`,
       link: "/cases"
     },
     {
       title: "Windsurf IDE - Code Editor",
       type: "UI/UX Design",
-      image: "/images/projects/windsurf.jpg",
+      image: `${import.meta.env.BASE_URL}images/projects/windsurf.jpg`,
       link: "/cases"
     },
     {
       title: "Tesla Mobile App Concept",
       type: "Mobile Design",
-      image: "/images/projects/tesla.jpg",
+      image: `${import.meta.env.BASE_URL}images/projects/tesla.jpg`,
       link: "/cases"
     }
   ]
@@ -425,15 +401,9 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <Title>
-              Artem Svitelskyi
-            </Title>
-            <Subtitle>
-              UI/UX Designer & Creative Developer
-            </Subtitle>
-            <Subtitle>
-              Transforming Ideas into Seamless Digital Experiences
-            </Subtitle>
+            <Title>Artem Svitelskyi</Title>
+            <Subtitle>UI/UX Designer & Creative Developer</Subtitle>
+            <Subtitle>Transforming Ideas into Seamless Digital Experiences</Subtitle>
           </HeroContent>
         </SectionContent>
       </HeroSection>
@@ -447,16 +417,8 @@ const Home = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: index * 0.1,
-                  ease: [0.645, 0.045, 0.355, 1.000]
-                }}
-                viewport={{ 
-                  once: true, 
-                  margin: "-10%",
-                  amount: 0.3 
-                }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-10%" }}
               >
                 <ProcessIcon 
                   $gradientStart={step.gradientStart} 
@@ -476,24 +438,13 @@ const Home = () => {
               <ProjectCard
                 key={index}
                 to={project.link}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ 
-                  duration: 0.6,
-                  delay: index * 0.15,
-                  ease: [0.645, 0.045, 0.355, 1.000]
-                }}
-                viewport={{ 
-                  once: true, 
-                  margin: "-10%",
-                  amount: 0.3
-                }}
+                as={motion.div}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-10%" }}
               >
-                <ProjectImage 
-                  image={project.image}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <ProjectImage image={project.image} />
                 <ProjectOverlay>
                   <ProjectTitle>{project.title}</ProjectTitle>
                   <ProjectType>{project.type}</ProjectType>
@@ -503,14 +454,12 @@ const Home = () => {
           </ProjectsGrid>
 
           <CTASection>
-            <CTAButton to="/cases">
-              View All Cases
-            </CTAButton>
+            <CTAButton to="/cases">View All Cases</CTAButton>
           </CTASection>
         </SectionContent>
       </Section>
     </HomeContainer>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
