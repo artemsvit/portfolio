@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 // Base styled components
@@ -47,32 +47,31 @@ const HeroSection = styled(Section)`
   padding: ${props => props.theme.spacing['5xl']} 0;
   background: #000000;
   overflow: hidden;
+`
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('${import.meta.env.BASE_URL}images/hero/hero-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    filter: brightness(0.4) contrast(1.2);
-    z-index: 0;
-  }
+const HeroBackground = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('${import.meta.env.BASE_URL}images/hero/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.4) contrast(1.2);
+  z-index: 0;
+  will-change: transform;
+`
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-  }
+const HeroOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  pointer-events: none;
 `
 
 const HeroContent = styled(motion.div)`
@@ -126,33 +125,30 @@ const SectionTitle = styled.h2`
 // Process Components
 const ProcessGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: ${props => props.theme.spacing.xl};
-  margin-bottom: ${props => props.theme.spacing['4xl']};
-
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.desktop}) {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  margin: ${props => props.theme.spacing.xl} 0;
+  contain: content;
+  will-change: transform;
 `
 
 const ProcessCard = styled(motion.div)`
-  background: ${props => props.theme.colors.background};
-  padding: ${props => props.theme.spacing.xl};
-  border-radius: ${props => props.theme.borderRadius.lg};
-  box-shadow: ${props => props.theme.shadows.md};
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
+  padding: ${props => props.theme.spacing.xl};
+  background: ${props => props.theme.colors.backgroundAlt};
+  border-radius: ${props => props.theme.borderRadius.lg};
+  box-shadow: ${props => props.theme.shadows.md};
+  transition: transform 0.3s ease;
+  contain: content;
+  will-change: transform, opacity;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: ${props => props.theme.shadows.lg};
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-5px);
+    }
   }
 `
 
@@ -192,35 +188,29 @@ const ProcessDescription = styled.p`
 // Project Components
 const ProjectsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: ${props => props.theme.spacing.xl};
-  margin-bottom: ${props => props.theme.spacing['4xl']};
-
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: ${props => props.theme.breakpoints.desktop}) {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  margin: ${props => props.theme.spacing.xl} 0;
+  contain: content;
+  will-change: transform;
 `
 
-const ProjectCard = styled(motion.div)`
+const ProjectCard = styled(motion(Link))`
   position: relative;
   border-radius: ${props => props.theme.borderRadius.lg};
   overflow: hidden;
-  aspect-ratio: 4/3;
-  cursor: pointer;
-  background: ${props => props.theme.colors.background};
-  will-change: transform;
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: ${props => props.theme.shadows.lg};
+  aspect-ratio: 16/9;
+  contain: content;
+  will-change: transform, opacity;
+
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.02);
+      
+      ${ProjectOverlay} {
+        opacity: 1;
+      }
+    }
   }
 `
 
@@ -258,6 +248,8 @@ const ProjectOverlay = styled.div`
   justify-content: flex-end;
   padding: ${props => props.theme.spacing.xl};
   z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 `
 
 const ProjectTitle = styled.h3`
@@ -303,6 +295,30 @@ const CTAButton = styled(Link)`
 
 // Component Implementation
 const Home = () => {
+  const { scrollY } = useScroll();
+  const heroRef = useRef(null);
+  
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 500], [1, 0.5]);
+  
+  const springY = useSpring(y, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+    
+    const loadImage = new Image();
+    loadImage.src = '${import.meta.env.BASE_URL}images/hero/hero-bg.jpg';
+    loadImage.onload = () => {
+      if (heroRef.current) {
+        heroRef.current.style.opacity = 1;
+      }
+    };
+  }, []);
+
   const processSteps = [
     {
       icon: (
@@ -395,7 +411,14 @@ const Home = () => {
 
   return (
     <HomeContainer>
-      <HeroSection>
+      <HeroSection ref={heroRef}>
+        <HeroBackground
+          style={{
+            y: springY,
+            opacity
+          }}
+        />
+        <HeroOverlay />
         <SectionContent>
           <HeroContent
             initial={{ opacity: 0, y: 20 }}
@@ -424,8 +447,16 @@ const Home = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true, margin: "-10%" }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  ease: [0.645, 0.045, 0.355, 1.000]
+                }}
+                viewport={{ 
+                  once: true, 
+                  margin: "-10%",
+                  amount: 0.3 
+                }}
               >
                 <ProcessIcon 
                   $gradientStart={step.gradientStart} 
@@ -444,14 +475,25 @@ const Home = () => {
             {projects.map((project, index) => (
               <ProjectCard
                 key={index}
-                as={Link}
                 to={project.link}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                viewport={{ once: true, margin: "-10%" }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ 
+                  duration: 0.6,
+                  delay: index * 0.15,
+                  ease: [0.645, 0.045, 0.355, 1.000]
+                }}
+                viewport={{ 
+                  once: true, 
+                  margin: "-10%",
+                  amount: 0.3
+                }}
               >
-                <ProjectImage image={project.image} />
+                <ProjectImage 
+                  image={project.image}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <ProjectOverlay>
                   <ProjectTitle>{project.title}</ProjectTitle>
                   <ProjectType>{project.type}</ProjectType>
