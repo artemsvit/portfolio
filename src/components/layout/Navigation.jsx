@@ -229,6 +229,13 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
 
+  const navItems = [
+    { path: '/home', label: 'Home' },
+    { path: '/about', label: 'About' },
+    { path: '/cases', label: 'Cases' },
+    { path: '/contact', label: 'Contact' }
+  ]
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -272,18 +279,11 @@ const Navigation = () => {
           <LogoText>ARTSVIT</LogoText>
         </LogoWrapper>
         <NavLinks>
-          <NavLink to="/" className={location.pathname === "/" ? "active" : ""}>
-            Home
-          </NavLink>
-          <NavLink to="/about" className={location.pathname === "/about" ? "active" : ""}>
-            About
-          </NavLink>
-          <NavLink to="/cases" className={location.pathname === "/cases" ? "active" : ""}>
-            Cases
-          </NavLink>
-          <NavLink to="/contact" className={location.pathname === "/contact" ? "active" : ""}>
-            Contact
-          </NavLink>
+          {navItems.map((item, index) => (
+            <NavLink key={index} to={item.path} className={location.pathname === item.path ? "active" : ""}>
+              {item.label}
+            </NavLink>
+          ))}
         </NavLinks>
         <MobileMenuButton 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -311,46 +311,19 @@ const Navigation = () => {
             },
           }}
         >
-          <motion.div
-            variants={{
-              closed: { opacity: 0, y: 20 },
-              open: { opacity: 1, y: 0 },
-            }}
-          >
-            <MobileNavLink to="/" className={location.pathname === "/" ? "active" : ""}>
-              Home
-            </MobileNavLink>
-          </motion.div>
-          <motion.div
-            variants={{
-              closed: { opacity: 0, y: 20 },
-              open: { opacity: 1, y: 0 },
-            }}
-          >
-            <MobileNavLink to="/about" className={location.pathname === "/about" ? "active" : ""}>
-              About
-            </MobileNavLink>
-          </motion.div>
-          <motion.div
-            variants={{
-              closed: { opacity: 0, y: 20 },
-              open: { opacity: 1, y: 0 },
-            }}
-          >
-            <MobileNavLink to="/cases" className={location.pathname === "/cases" ? "active" : ""}>
-              Cases
-            </MobileNavLink>
-          </motion.div>
-          <motion.div
-            variants={{
-              closed: { opacity: 0, y: 20 },
-              open: { opacity: 1, y: 0 },
-            }}
-          >
-            <MobileNavLink to="/contact" className={location.pathname === "/contact" ? "active" : ""}>
-              Contact
-            </MobileNavLink>
-          </motion.div>
+          {navItems.map((item, index) => (
+            <motion.div
+              key={index}
+              variants={{
+                closed: { opacity: 0, y: 20 },
+                open: { opacity: 1, y: 0 },
+              }}
+            >
+              <MobileNavLink to={item.path} className={location.pathname === item.path ? "active" : ""}>
+                {item.label}
+              </MobileNavLink>
+            </motion.div>
+          ))}
         </MobileMenuLinks>
       </MobileMenuContainer>
     </Nav>
