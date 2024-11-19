@@ -37,7 +37,7 @@ const ProjectImage = styled.div`
   width: 100%;
   height: 250px;
   background-color: ${props => props.theme.colors.secondary};
-  background-image: url(${props => props.image});
+  background-image: url(${props => `${import.meta.env.BASE_URL}${props.image.replace(/^\//, '')}`});
   background-size: cover;
   background-position: center;
 `
@@ -77,37 +77,37 @@ const Cases = () => {
       title: "Codeium AI - Developer Tool",
       description: "Designed and developed key features for an AI-powered code completion tool, focusing on user experience and developer productivity.",
       tags: ["Product Design", "Developer Tools", "AI/ML", "React"],
-      image: "/images/projects/codeium.jpg"
+      image: "images/projects/codeium.jpg"
     },
     {
       title: "Windsurf IDE - Code Editor",
       description: "Led the design of a next-generation code editor with AI capabilities, creating an intuitive and powerful development environment.",
       tags: ["UI/UX", "Developer Tools", "Electron", "React"],
-      image: "/images/projects/windsurf.jpg"
+      image: "images/projects/windsurf.jpg"
     },
     {
       title: "Anthropic Claude - AI Assistant",
       description: "Contributed to the design of conversational interfaces and developer tools for an advanced AI assistant platform.",
       tags: ["AI/ML", "UI Design", "Developer Experience"],
-      image: "/images/projects/claude.jpg"
+      image: "images/projects/claude.jpg"
     },
     {
       title: "Portfolio Website",
       description: "Personal portfolio website showcasing UX design work and development projects, built with React and modern animation libraries.",
       tags: ["Web Design", "React", "Framer Motion"],
-      image: "/images/projects/portfolio.jpg"
+      image: "images/projects/portfolio.jpg"
     },
     {
       title: "Tesla Mobile App Concept",
       description: "Redesigned concept for Tesla's mobile app, focusing on improved vehicle control and charging management features.",
       tags: ["Mobile Design", "UI/UX", "Automotive"],
-      image: "/images/projects/tesla.jpg"
+      image: "images/projects/tesla.jpg"
     },
     {
       title: "Banking Dashboard",
       description: "Modern financial management dashboard with real-time analytics, transaction monitoring, and intuitive data visualization.",
       tags: ["FinTech", "Dashboard Design", "Data Viz"],
-      image: "/images/projects/banking.jpg"
+      image: "images/projects/banking.jpg"
     }
   ]
 
