@@ -266,7 +266,7 @@ const About = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <img src="/images/about/profile.jpg" alt="Artem Svitelskyi" />
+              <img src={`${import.meta.env.BASE_URL}images/about/profile.jpg`} alt="Artem Svitelskyi" />
             </ProfileImage>
             <AboutContent
               initial={{ opacity: 0, x: 20 }}

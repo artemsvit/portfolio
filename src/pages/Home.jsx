@@ -55,7 +55,7 @@ const HeroSection = styled(Section)`
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('/images/hero/hero-bg.jpg');
+    background-image: url('${import.meta.env.BASE_URL}images/hero/hero-bg.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -227,7 +227,7 @@ const ProjectCard = styled(motion.div)`
 const ProjectImage = styled.div`
   width: 100%;
   height: 100%;
-  background-image: url(${props => props.image});
+  background-image: url(${props => `${import.meta.env.BASE_URL}${props.image}`});
   background-size: cover;
   background-position: center;
   transition: transform 0.3s ease;

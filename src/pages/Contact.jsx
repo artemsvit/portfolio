@@ -385,7 +385,7 @@ const Contact = () => {
 
       <MapContainer>
         <img 
-          src="/images/map.png" 
+          src={`${import.meta.env.BASE_URL}images/map.png`} 
           alt="Location Map"
         />
         <MapOverlay />
